@@ -4,7 +4,7 @@ The goal for this project is to take a specified list of search terms, use each 
 
 ## GET HTML
 
-The first step is to GET the web page HTML by using the API of a PoolManager (using `urllib3`). As recommended by the `urllib3` [documentation](https://urllib3.readthedocs.io/en/latest/user-guide.html#ssl), SSL certificate verification should be used when making HTTPS requests. Mozilla's root certificate bundle is available via the `certifi` package.
+The first step is to GET the web page HTML by using the API of a PoolManager (using urllib3). As recommended by the urllib3 [documentation](https://urllib3.readthedocs.io/en/latest/user-guide.html#ssl), SSL certificate verification should be used when making HTTPS requests. Mozilla's root certificate bundle is available via the certifi package.
 
 ```python
 import certifi
@@ -16,9 +16,9 @@ http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED',
 
 Starting at the home page for Amazon, manually enter one of the specified searches in order to see how the URL changes in order to direct to that search request. In this example, the search 'python books' leads to the following URL:
 
-> 'https://www.amazon.com/s/ref=nb_sb_noss_1?url=search-alias%3Daps&field-keywords=python+books'
+'https://www.amazon.com/s/ref=nb_sb_noss_1?url=search-alias%3Daps&field-keywords=python+books'
 
-This indicates that the base URL for the search results page is everything up to `&field-keywords=` followed by the search terms separated by a `+` sign. A couple of tests typing different search terms directly into the URL in this fashion will verify this assumption. 
+This indicates that the base URL for the search results page is everything up to '&field-keywords=' followed by the search terms separated by a '+' sign. A couple of tests typing different search terms directly into the URL in this fashion will verify this assumption. 
 
 The next step, then, is to store the base URL as a string object so that each additional search string can be added to this as needed. Starting with the search term 'sneakers':
 
