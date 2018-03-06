@@ -1,6 +1,6 @@
 ## Introduction
 
-The goal for this project is to take a specified list of search terms, use each one in a basic search on [Amazon](https://www.amazon.com/), and pull key data (product name, price, rating) from the resulting page. This GitHub Page will walk through each of the steps required in detail, addressing ways to capture the key data when web design differences may apply.
+The goal for this project is to take a specified list of search terms, use each of those in a basic search on [Amazon](https://www.amazon.com/), and pull key data (product name, price, rating) from the resulting page. The final result will be structured data that includes each of the key data points in addition to metadata (order of results, search terms used) which can be used for analysis.
 
 ## GET HTML
 
@@ -14,7 +14,7 @@ http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED',
                            ca_certs=certifi.where())
 ```
 
-Starting at the home page for Amazon, manually enter one of the specified searches in order to see how the URL changes in order to direct to that search request. In this example, the search 'python books' leads to the following URL:
+Starting at the home page for Amazon, manually enter one of the specified searches in order to see how the URL changes when directed to that search request. For example, the search 'python books' (entered manually in the Amazon search tool) leads to the following URL:
 
 'https://www.amazon.com/s/ref=nb_sb_noss_1?url=search-alias%3Daps&field-keywords=python+books'
 
