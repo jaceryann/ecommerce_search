@@ -1,6 +1,6 @@
 ## Introduction
 
-The goal for this project is to take a specified list of search word(s), use each in a basic search on [Amazon](https://www.amazon.com/), and pull key data (product name, price, rating) from the resulting page. The final result will be structured data that includes each of the key data points in addition to some basic metadata (order of results, search terms used) which can be used for analysis.
+The goal for this project is to take a specified list of search word(s), use each in a basic search on [Amazon](https://www.amazon.com/), and pull key data (product name, price, rating) from the resulting page. The final result will be a structured data set that includes each of the key data points in addition to some basic metadata (order of results, search terms used) which can be used for analysis.
 
 ## GET HTML
 
@@ -14,11 +14,11 @@ http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED',
                            ca_certs=certifi.where())
 ```
 
-Starting at the home page for Amazon, manually enter one of the specified searches in order to examine the URL from the resulting page. For example, the search 'python books' (entered manually in the Amazon search tool) results in the following URL:
+Starting at the home page for Amazon, manually enter one of the specified searches in order to examine the URL from the resulting page. For example, the search 'python books' (entered manually in the Amazon search tool) directs to the following URL:
 
 'https://www.amazon.com/s/ref=nb_sb_noss_1?url=search-alias%3Daps&field-keywords=python+books'
 
-This indicates that the base URL for the search results page is everything up to '...&field-keywords=' followed by the search terms (separated by a '+' sign if search contains more than one word). A couple of tests typing different search terms directly into the URL in this fashion will verify this assumption. 
+This indicates that the base URL for the search results page is everything up to '...&field-keywords=' followed by the search word(s) (separated by a '+' sign if search contains more than one word). A couple of tests typing different searches directly into the URL in this fashion will verify this assumption. 
 
 The next step is to store the base URL as a string object so that each additional search string can be added to this as needed. Starting with the search term 'sneakers', build a complete search URL as follows:
 
