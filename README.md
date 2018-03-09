@@ -14,13 +14,13 @@ http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED',
                            ca_certs=certifi.where())
 ```
 
-Starting at the home page for Amazon, manually enter one of the specified searches in order to examine the URL from the resulting page. For example, the search 'python books' (entered manually in the Amazon search tool) directs to the following URL:
+Start by navigating to the home page for Amazon in a browser and manually enter one of the specified searches in order to examine the URL from the resulting page. For example, the search 'python books' (entered manually in the Amazon search tool) directs to the following URL:
 
 'https://www.amazon.com/s/ref=nb_sb_noss_1?url=search-alias%3Daps&field-keywords=python+books'
 
-This indicates that the base URL for the search results page is everything up to '...&field-keywords=' followed by the search word(s) (separated by a '+' sign if search contains more than one word). A couple of tests typing different searches directly into the URL in this fashion will verify this assumption. 
+This indicates that the URL for a search result page is everything up to '...&field-keywords=' followed by the search word or words (separated by a '+' sign if the search contains more than one word). A couple of tests entering the above URL (adjusted for different search criteria) directly into the address bar of the browser will verify this assumption. 
 
-The next step is to store the base URL as a string object so that each additional search string can be added to this as needed. Starting with the search term 'sneakers', build a complete search URL as follows:
+The next step is to store the base of the above URL as a string object so that each search string can be added to this as needed. Starting with the search term 'sneakers', build a complete search URL as follows:
 
 ```python
 base_url = 'https://www.amazon.com/s/ref=nb_sb_noss_1?url=search-alias%3Daps&field-keywords='
@@ -43,4 +43,28 @@ import html5lib
 s_page = http.urlopen('GET', search1)
 
 page_soup = BeautifulSoup(s_page.data, 'html5lib')
+```
+
+## Locate Key Data
+
+The Beautiful Soup package provides a lot of useful functions that help with navigating to and from HTML tags indcluding finding parents, children, and siblings of tags as well as locating tags by CSS selectors, HTML tag types, or text within tags ([Details in the full documentation here](https://www.crummy.com/software/BeautifulSoup/bs4/doc/)). The crucial piece in gathering the data you need from a particular web site is understanding how to identify which HTML elements point to the data you need. *(Note: You can use developer tools in a browser to examine source code for a particular page to help get that information.)*
+
+For this project, the key data for each product returned from the search is contained within **<div>** tags of the class **"s-item-container"**. The following is a snippet of that HTML markup for one of the products from the 'sneaker' search.
+
+```html
+<div class="s-item-container">
+ <div class="a-row a-spacing-top-micro a-spacing-micro">
+  
+    ...
+
+ </div>
+</div>
+```
+
+All of the HTML markup related to a single specific product is truncated in the '...' above. This includes the key data needed to build the final data set.
+
+Given this discovery, use the **find_all** method to gather each product's **<div class="s-item-container">** tag. This returns a list where each item is a single Beautiful Soup object.
+
+```python
+prod_li = page_soup.find_all('div', class_="s-item-container")
 ```
