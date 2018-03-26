@@ -1,31 +1,33 @@
 ## Introduction
 
-The goal for this project is to take a specified list of search word(s), use each in a basic search on [Amazon](https://www.amazon.com/), and pull key data (product name, price, rating) from the resulting page. The final result will be a structured data set that includes each of the key data points in addition to some basic metadata (order of results, search terms used) which can be used for analysis.
+The goal for this project is to take a list of search words, use each word or word combination in a basic search on [Amazon](https://www.amazon.com/), and pull key data (product name, price, rating) from the resulting page. The final result will be a structured data set that includes each of the key data points in addition to some basic metadata (order of results, search terms used) which can be used for analysis.
 
 ## GET HTML
 
-The first step is to GET the web page HTML using the API of a PoolManager (using **urllib3**). As recommended by the **urllib3** [documentation](https://urllib3.readthedocs.io/en/latest/user-guide.html#ssl), SSL certificate verification should be used when making HTTPS requests. Mozilla's root certificate bundle is available via the certifi package.
+The first step is to GET the web page HTML using the API of a PoolManager (via **urllib3**). As recommended by the **urllib3** [documentation](https://urllib3.readthedocs.io/en/latest/user-guide.html#ssl), SSL certificate verification should be used when making HTTPS requests. Mozilla's root certificate bundle is available via the certifi package.
 
 ```python
-import certifi
 import urllib3
+import certifi
 
 http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', 
                            ca_certs=certifi.where())
 ```
 
-Start by navigating to the home page for Amazon in a browser and manually enter one of the specified searches in order to examine the URL from the resulting page. For example, the search 'python books' (entered manually in the Amazon search tool) directs to the following URL:
+To begin, navigate to the Amazon home page and manually enter one of the specified searches in order to examine how the resulting URL points to the search results. For example, the search 'python books' (entered manually in the Amazon search tool) directs to the following URL:
 
+```
 'https://www.amazon.com/s/ref=nb_sb_noss_1?url=search-alias%3Daps&field-keywords=python+books'
+```
 
 This indicates that the URL for a search result page is everything up to '...&field-keywords=' followed by the search word or words (separated by a '+' sign if the search contains more than one word). A couple of tests entering the above URL (adjusted for different search criteria) directly into the address bar of the browser will verify this assumption. 
 
 The next step is to store the base of the above URL as a string object so that each search string can be added to this as needed. Starting with the search term 'sneakers', build a complete search URL as follows:
 
 ```python
-base_url = 'https://www.amazon.com/s/ref=nb_sb_noss_1?url=search-alias%3Daps&field-keywords='
+base_url = "https://www.amazon.com/s/ref=nb_sb_noss_1?url=search-alias%3Daps&field-keywords="
 
-s_terms1 = 'sneakers'
+s_terms1 = "sneakers"
 
 search1 = base_url + s_terms1
 ```
