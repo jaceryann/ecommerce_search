@@ -49,7 +49,7 @@ page_soup = BeautifulSoup(s_page.data, 'html5lib')
 
 The Beautiful Soup package provides a lot of useful functions that help with navigating to and from HTML tags indcluding finding parents, children, and siblings of tags as well as locating tags by CSS selectors, HTML tag types, or text within tags ([Details in the full documentation here](https://www.crummy.com/software/BeautifulSoup/bs4/doc/)). The crucial piece in gathering data from a particular web site is understanding how to identify which HTML elements point to the data you need. *(Note: You can use developer tools in a browser to examine source code for a particular page to help get that information.)*
 
-For this project, the key data for each product returned from the search is contained within **<div>** tags of the class **"s-item-container"**. The following is a snippet of that HTML markup for one of the products from the 'sneaker' search.
+For this project, the key data for each product returned from the search is contained within **div** tags of the class **"s-item-container"**. The following is a snippet of that HTML markup for one of the products from the 'sneaker' search.
 
 ```html
 <div class="s-item-container">
@@ -70,9 +70,9 @@ For this project, the key data for each product returned from the search is cont
 </div>
 ```
 
-All of the HTML markup related to a single product is truncated in the outer '...' above (inside the first two **<div>** tags). This includes all of the key data needed to build the final data set. As an example, the snippet above shows part of the HTML markup where *product title* can be retrieved.
+All of the HTML markup related to a single product is truncated in the outer '...' above (inside the first two **div** tags). This includes all of the key data needed to build the final data set. As an example, the snippet above shows part of the HTML markup where *product title* can be retrieved.
 
-Use the **find_all** method to gather each **<div class="s-item-container">** tag from the entire page. The result is a list of individual Beautiful Soup objects, each a section of the HTML markup that represents a single product.
+Use the **find_all** method to gather each **div class="s-item-container"** tag from the entire page. The result is a list of individual Beautiful Soup objects, each a section of the HTML markup that represents a single product.
 
 ```python
 prod_li = page_soup.find_all('div', class_="s-item-container")
