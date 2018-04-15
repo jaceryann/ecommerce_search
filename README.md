@@ -97,9 +97,9 @@ Now that each of the product sections are stored as individual Beautiful Soup ob
 
 ## Building a Dataframe
 
-My preference for building a Pandas dataframe is to create a dictionary of lists (where each key is a dataframe variable with a list of values for every record) and then applying the **from_dict** method on that dictionary. Each of the data gathering techniques, then, will be to build a list.
+My preference for building a data set in Python is the Pandas dataframe. Specifically, I find it easiest to create a dictionary of lists (where each key is a dataframe variable with a list of values for every record) and then applying the **from_dict** method on that dictionary to create the dataframe. Each of the data gathering techniques, then, will involve gathering the data from the search return into separate lists.
 
-To begin, make sure that all of the **s-item-container** class tags in the list have some information contained within the main tags as we are not interested in those that do not. The Beautiful Soup **contents** method will return each of the children of a Beutiful Soup object. The length of the **contents** will be 0 if no children are present. Use this with list comprehension to clean up the main product list.
+To begin, make sure that all of the **div class="s-item-container"** tags in the list have some information contained within them as they are not of interest otherwise. The Beautiful Soup **contents** method will return each of the children of a Beutiful Soup object. The length of the **contents** call will be 0 if no children are present. Use this information along with list comprehension to clean up the main product list.
 
 ```python
 prod_li = [bso for bso in prod_li if len(bso.contents) > 0]
@@ -107,14 +107,18 @@ prod_li = [bso for bso in prod_li if len(bso.contents) > 0]
 
 ### Product Title
 
-Each product title is located inside an **h2** tag as a child of each of the **div class="s-item-container"** pulled for the main product list. Since this is the only occurrance of this tag for each of the items in the list, you can use the **get_text** method in a list comprehension to pull all of these into a new list.
+Each product title is located inside an **h2** tag which is a child of each of the **div class="s-item-container"** tags pulled for the main product list. 
 
-As you can see from the HTML snippet above that shows product title, the **h2** tag also returns the text "[Sponsored]". Since this information isn't necessarily a part of the desired data, you can remove as you pull in using a substitute function from the **re** package.
+Calling a tag name on an object will return the first instance of that tag (Ex: **soup.a** returns the first **a** tag located inside of a Beautiful Soup object called soup). Subsequently, the **get_text** method returns only the text contained inside of of a given tag. Since the **h2** tag contains the product title text, you can use a combined approach in a list comprehension to build a new list conatining the product titles.
+
+Also note (as you can see from the HTML snippet above that shows product title above), the **h2** tag will return the text "[Sponsored]". Since this information isn't necessarily a part of the desired data, you can remove as you pull in the title text using a pattern substitute function from the **re** package.
 
 ```python
-prod_title = [re.sub('\[Sponsored\]', '', bso.h3.get_text()) for bso in prod_li]
+import re
 
->>> print(prod_title[0])
+prod_title = [re.sub('\[Sponsored\]', '', bso.h2.get_text()) for bso in prod_li]
+
+>>> prod_title[0]
 "EpicStep Women's Canvas Shoes High Top Wedges High Heels Quilted Casual Fashion Sneakers"
 ```
 
