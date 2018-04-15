@@ -72,8 +72,50 @@ For this project, the key data for each product returned from the search is cont
 
 All of the HTML markup related to a single product is truncated in the outer '...' above (inside the first two **div** tags). This includes all of the key data needed to build the final data set. As an example, the snippet above shows part of the HTML markup where *product title* can be retrieved.
 
-Use the **find_all** method to gather each **div class="s-item-container"** tag from the entire page. The result is a list of individual Beautiful Soup objects, each a section of the HTML markup that represents a single product.
+Use the **find_all** method to gather each **div class="s-item-container"** tag from the entire page. The result is a list of individual Beautiful Soup objects, each a section of the HTML markup that represents a single product. You can print Beautiful Soup objects using the **prettify** which produces a Unicode string in an easy to read format (truncated below).
 
 ```python
 prod_li = page_soup.find_all('div', class_="s-item-container")
+
+>>> print(prod_li[0].prettify())
+<div class="s-item-container">
+ <div class="a-row a-spacing-top-micro a-spacing-micro">
+  <div class="a-row sx-badge-region">
+   <div class="a-row a-spacing-large">
+   </div>
+  </div>
+ </div>
+ <div class="a-row a-spacing-base">
+  <div aria-hidden="true" class="a-column a-span12 a-text-center s-position-relative">
+  ...
+</div>
 ```
+
+Now that each of the product sections are stored as individual Beautiful Soup objects in a iterable list, we can use list comprehension to gather key data from each product section to begin building a dataframe. 
+
+*Note: From this point forward, there will not be much detail about how to discover where certain elements are contained within the HTML. Just note that it is done through a combination of finding web elements using browser developer tool search functions and Beautiful Soup navigation techniques. Obviously, different pages are build differently by different developers, so this is the part of web scraping tasks that will vary from page to page and will require some amount of researching to get what you need.*
+
+## Building a Dataframe
+
+My preference for building a Pandas dataframe is to create a dictionary of lists (where each key is a dataframe variable with a list of values for every record) and then applying the **from_dict** method on that dictionary. Each of the data gathering techniques, then, will be to build a list.
+
+To begin, make sure that all of the **s-item-container** class tags in the list have some information contained within the main tags as we are not interested in those that do not. The Beautiful Soup **contents** method will return each of the children of a Beutiful Soup object. The length of the **contents** will be 0 if no children are present. Use this with list comprehension to clean up the main product list.
+
+```python
+prod_li = [bso for bso in prod_li if len(bso.contents) > 0]
+```
+
+### Product Title
+
+Each product title is located inside an **h2** tag as a child of each of the **div class="s-item-container"** pulled for the main product list. Since this is the only occurrance of this tag for each of the items in the list, you can use the **get_text** method in a list comprehension to pull all of these into a new list.
+
+As you can see from the HTML snippet above that shows product title, the **h2** tag also returns the text "[Sponsored]". Since this information isn't necessarily a part of the desired data, you can remove as you pull in using a substitute function from the **re** package.
+
+```python
+prod_title = [re.sub('\[Sponsored\]', '', bso.h3.get_text()) for bso in prod_li]
+
+>>> print(prod_title[0])
+"EpicStep Women's Canvas Shoes High Top Wedges High Heels Quilted Casual Fashion Sneakers"
+```
+
+  
