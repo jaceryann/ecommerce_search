@@ -122,4 +122,61 @@ prod_title = [re.sub('\[Sponsored\]', '', bso.h2.get_text()) for bso in prod_li]
 "EpicStep Women's Canvas Shoes High Top Wedges High Heels Quilted Casual Fashion Sneakers"
 ```
 
-  
+### Product Price
+
+The price extraction is less straight forward than the title, but it provides a good example of how more complicated web design can make getting information more difficult and some approaches you can take to get there.
+
+In the case of Amazon, the pricing information is contained within a **span** tag, but the classes vary. In addition, sometimes there are price ranges listed, and sometimes there is no price listed at all. And for even further complication, prices are rarely created as a simple string. Take, for example, the Beautiful Soup object, **ex_soup** which was extracted and stored from the working product (EpicStep Women's Canvas Shoes ...), which is a typical price setup.
+
+```python
+>>> print(ex_soup.prettify())
+<span class="sx-price sx-price-large">
+  <sup class="sx-price-currency">
+    $
+  </sup>
+  <span class="sx-price-whole">
+    50
+  </span>
+  <sup class="sx-price-fractional">
+    99
+  </sup>
+</span>
+```
+
+If you were to **get_text** from this soup element, you would end up with line breaks and no decimal point. It would be easy enough to clean up this text to make it look more like a price tag, but these rules would not necissarily work for all of the product pricing. Take a look at a ex2_soup and ex3_soup which were pulled from the same product list for two other products:
+
+```python
+>>> print(ex2_soup.prettify())
+<span class="sx-price sx-price-large">
+ <sup class="sx-price-currency">
+  $
+ </sup>
+ <span class="sx-price-whole">
+  24
+ </span>
+ <sup class="sx-price-fractional">
+  99
+ </sup>
+ <span class="sx-dash-formatting">
+  -
+ </span>
+ <sup class="sx-price-currency">
+  $
+ </sup>
+ <span class="sx-price-whole">
+  36
+ </span>
+ <sup class="sx-price-fractional">
+  99
+ </sup>
+</span>
+
+>>> print(ex3_soup.prettify())
+<span class="a-size-base a-color-base s-price">
+ $9.99
+</span>
+```
+
+In the first case above, the price is contained in the typical setup, but it is a price range instead of a single price. In the second, there is a different class of the **span** tag and the decimal is already there so it does not need to be replaced. All of these factors will need to be accounted for as prices are being extracted. 
+
+A useful aspect of Beautiful Soup is that you can create a custom function with custom criteria (that returns **True** or **False**) and pass that function to **find_all**. You can also use a regular expression object within **find_all** 
