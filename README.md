@@ -143,7 +143,7 @@ In the case of Amazon, the pricing information is contained within a **span** ta
 </span>
 ```
 
-If you were to **get_text** from this soup element, you would end up with line breaks and no decimal point. It would be easy enough to clean up this text to make it look more like a price tag, but these rules would not necissarily work for all of the product pricing. Take a look at a ex2_soup and ex3_soup which were pulled from the same product list for two other products:
+If you were to **get_text** from this soup element, you would end up with line breaks and no decimal point. It would be easy enough to clean up this text to make it look more like a price tag, but these rules would not necissarily work for all of the product pricing. Take a look at a **ex2_soup** and **ex3_soup** below which were pulled from the same product list but for two different products:
 
 ```python
 >>> print(ex2_soup.prettify())
@@ -177,6 +177,29 @@ If you were to **get_text** from this soup element, you would end up with line b
 </span>
 ```
 
-In the first case above, the price is contained in the typical setup, but it is a price range instead of a single price. In the second, there is a different class of the **span** tag and the decimal is already there so it does not need to be replaced. All of these factors will need to be accounted for as prices are being extracted. 
+In the first case above, the price is contained inside similar tags in the same fashion as the previous example, but for a price range instead of a single price (this means two price tags separated by a '-'). In the second, the **span** tag class is different and the price is a simple string that is not divided up into separate 'whole' and 'fractional' class tags. All of these factors will need to be accounted for as prices are being extracted. 
 
-A useful aspect of Beautiful Soup is that you can create a custom function with custom criteria (that returns **True** or **False**) and pass that function to **find_all**. You can also use a regular expression object within **find_all** 
+A useful aspect of Beautiful Soup is that you can create a custom function that returns **True** or **False** based on custom criteria and pass that function to **find_all**. You can also use a regular expression object for **find_all** arguments (such as **class_**, **string**, **href**, etc.). The code below applies both of these techniques to find prices based on the following criteria:
+
+1. Look for **span** tag that has one of the following:
+   * A child tag named **sup**
+   * A string containing the '$' character
+   * At least one child **span** tag of the class 'a-letter-space'
+2. Parent **span** tag class should be one of the following:
+   * 'sx-price'
+   * 'sx-price-large'
+   * 'a-size-base'
+   * 'a-color-base'
+
+```python
+def has_price_char(tag):
+    test2 = tag.findChild('sup') is not None
+    test3 = tag.string is not None and '$' in tag.string
+    test4 = len(tag.select('span.a-letter-space')) > 0
+    return tag.name == 'span' and (test2 or test3 or test4)
+
+
+regx_pr_cl = re.compile('(sx-price|sx-price-large|a-size-base|a-color-base)')
+
+pr_tag = [item.find(has_price_char, class_=regx_pr_cl) for item in pr_list]
+```
