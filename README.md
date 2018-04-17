@@ -201,7 +201,7 @@ def has_price_char(tag):
 
 regx_pr_cl = re.compile('(sx-price|sx-price-large|a-size-base|a-color-base)')
 
-pr_tag = [bso.find(has_price_char, class_=regx_pr_cl) for item in pr_list]
+pr_tag = [bso.find(has_price_char, class_=regx_pr_cl) for bso in prod_li]
 ```
 
 The **pr_tag** list should contain a single soup object for each of the instances where price was available and nothing where price was not available. *Note: Keeping the 'nothing' instances in the list maintains the record order for the final data set.*
@@ -209,9 +209,9 @@ The **pr_tag** list should contain a single soup object for each of the instance
 The next step is to **get_text** from each of the items in **pr_tag** and clean up the text where needed. The code below shows before and after sample text for each of the different steps (for the three different price formats exemplified above: assume pr_tag[0] == ex_soup, pr_tag[1] == ex1_soup, and pr_tag[2] == ex2_soup).
 
 ```python
-# first, get_text from pr_list: use split and join methods to remove white space and create a single string
+# first, get_text from pr_list: use split and join methods to remove white space
 # store '' in list if no soup object available to maintain record length and order
-prod_price = ["".join(bso.get_text().split()) if bso else '' for item in pr_tag] 
+prod_price = ["".join(bso.get_text().split()) if bso else '' for bso in pr_tag] 
 
 >>> prod_price[0]
 '$5099'
@@ -252,3 +252,17 @@ prod_price = [add_dot_rng(prstr) if '-' in prstr and prstr.count('.') < 2 else p
 >>> prod_price[2]
 '$9.99'
 ```
+
+### Product Rating
+
+The rating for each product, if available, is contained within a **span** tag of class 'a-icon-alt'. However, this class of **span** is also used for other icons so in order to differentiate, look for the word 'star' in the text. *Note: Again, maintain blanks where rating not available to keep lists the same length and order.*
+
+```python
+prod_rate = [bso.find('span', string=re.compile('star'), class_='a-icon-alt') for bso in prod_li]
+
+prod_rate = [bso.get_text() if bso else '' for bso in prod_rate]
+
+>>> prod_rate[0]
+'3.3 out of 5 stars'
+```
+
