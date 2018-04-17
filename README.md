@@ -201,5 +201,54 @@ def has_price_char(tag):
 
 regx_pr_cl = re.compile('(sx-price|sx-price-large|a-size-base|a-color-base)')
 
-pr_tag = [item.find(has_price_char, class_=regx_pr_cl) for item in pr_list]
+pr_tag = [bso.find(has_price_char, class_=regx_pr_cl) for item in pr_list]
+```
+
+The **pr_tag** list should contain a single soup object for each of the instances where price was available and nothing where price was not available. *Note: Keeping the 'nothing' instances in the list maintains the record order for the final data set.*
+
+The next step is to **get_text** from each of the items in **pr_tag** and clean up the text where needed. The code below shows before and after sample text for each of the different steps (for the three different price formats exemplified above: assume pr_tag[0] == ex_soup, pr_tag[1] == ex1_soup, and pr_tag[2] == ex2_soup).
+
+```python
+# first, get_text from pr_list: use split and join methods to remove white space and create a single string
+# store '' in list if no soup object available to maintain record length and order
+prod_price = ["".join(bso.get_text().split()) if bso else '' for item in pr_tag] 
+
+>>> prod_price[0]
+'$5099'
+
+>>> prod_price[1]
+'$2499-$3699'
+
+>>> prod_price[2]
+'$9.99'
+
+# next, add in decimals where missing for single price items and top of range prices
+prod_price = [prstr[:-2] + '.' + prstr[-2:] if '.' not in prstr else prstr for prstr in prod_price]
+
+>>> prod_price[0]
+'$50.99'
+
+>>> prod_price[1]
+'$2499-$36.99'
+
+>>> prod_price[2]
+'$9.99'
+
+# finally, for price ranges, add decimal to bottom of range price
+# create function for process to improve readability
+def add_dot_rng(prstr):
+    prstr = prstr[:(prstr.find('-') - 2)] + '.' + prstr[(prstr.find('-') - 2):]
+    return prstr
+
+
+prod_price = [add_dot_rng(prstr) if '-' in prstr and prstr.count('.') < 2 else prstr for prstr in prod_price]
+
+>>> prod_price[0]
+'$50.99'
+
+>>> prod_price[1]
+'$24.99-$36.99'
+
+>>> prod_price[2]
+'$9.99'
 ```
