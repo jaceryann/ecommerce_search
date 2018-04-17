@@ -279,7 +279,7 @@ final_data = {'list_order': list(range(1, len(pr_list) + 1)),
               'product_title': prod_title, 
               'price': prod_price, 
               'rating': prod_rate, 
-              'search_parameters': [s_terms_1] * len(pr_list)}
+              'search_parameters': [s_terms1] * len(pr_list)}
 
 import pandas as pd
 
