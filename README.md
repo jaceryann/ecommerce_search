@@ -95,9 +95,9 @@ Now that each of the product sections are stored as individual Beautiful Soup ob
 
 *Note: From this point forward, there will not be much detail about how to discover where certain elements are contained within the HTML. Just note that it is done through a combination of finding web elements using browser developer tool search functions and Beautiful Soup navigation techniques. Obviously, different pages are build differently by different developers, so this is the part of web scraping tasks that will vary from page to page and will require some amount of researching to get what you need.*
 
-## Building a Dataframe
+## Extract Data
 
-My preference for building a data set in Python is the Pandas dataframe. Specifically, I find it easiest to create a dictionary of lists (where each key is a dataframe variable with a list of values for every record) and then applying the **from_dict** method on that dictionary to create the dataframe. Each of the data gathering techniques, then, will involve gathering the data from the search return into separate lists.
+Ultimately, this project will end up with a single data set: a Pandas dataframe. This will be created by applying the **from_dict** method on a dictionary of lists (where each dictionary key is a dataframe variable with a list containing the values for every record). Each of the data gathering techniques, then, will involve gathering the data from the search return into separate lists.
 
 To begin, make sure that all of the **div class="s-item-container"** tags in the list have some information contained within them as they are not of interest otherwise. The Beautiful Soup **contents** method will return each of the children of a Beutiful Soup object. The length of the **contents** call will be 0 if no children are present. Use this information along with list comprehension to clean up the main product list.
 
@@ -266,3 +266,22 @@ prod_rate = [bso.get_text() if bso else '' for bso in prod_rate]
 '3.3 out of 5 stars'
 ```
 
+## Dataframe Build
+
+Now that all of the key data is collected into separate lists, you can add these lists into a single dictionary of lists which will be converted into a Pandas dataframe.
+
+In addition, this is a good time to add some additional data points that might be useful for analysis:
+  * list_order: sequential integers that will show the order in which products appeared at the time of search
+  * search_parameters: the search terms used to find the item (useful for building a bigger dataframe from multiple searches)
+
+```python
+final_data = {'list_order': list(range(1, len(pr_list) + 1)), 
+              'product_title': prod_title, 
+              'price': prod_price, 
+              'rating': prod_rate, 
+              'search_parameters': [s_terms_1] * len(pr_list)}
+
+import pandas as pd
+
+final_df = pd.DataFrame.from_dict(final_data)
+```
