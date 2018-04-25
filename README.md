@@ -72,7 +72,7 @@ For this project, the key data for each product returned from the search is cont
 
 All of the HTML markup related to a single product is truncated in the outer '...' above (inside the first two **div** tags). This includes all of the key data needed to build the final data set. As an example, the snippet above shows part of the HTML markup where *product title* can be retrieved.
 
-Use the **find_all** method to gather each **div class="s-item-container"** tag from the entire page. The result is a list of individual Beautiful Soup objects, each a section of the HTML markup that represents a single product. You can print Beautiful Soup objects using the **prettify** which produces a Unicode string in an easy to read format (truncated below).
+Use the **find_all** method to gather each **div class="s-item-container"** tag from the entire page. The result is a list of individual Beautiful Soup objects, each a section of the HTML markup that represents a single product. You can print Beautiful Soup objects using the **prettify** method which produces a Unicode string in an easy to read format (truncated example below).
 
 ```python
 prod_li = page_soup.find_all('div', class_="s-item-container")
@@ -93,13 +93,13 @@ prod_li = page_soup.find_all('div', class_="s-item-container")
 
 Now that each of the product sections are stored as individual Beautiful Soup objects in a iterable list, we can use list comprehension to gather key data from each product section to begin building a dataframe. 
 
-*Note: From this point forward, there will not be much detail about how to discover where certain elements are contained within the HTML. Just note that it is done through a combination of finding web elements using browser developer tool search functions and Beautiful Soup navigation techniques. Obviously, different pages are build differently by different developers, so this is the part of web scraping tasks that will vary from page to page and will require some amount of researching to get what you need.*
+*Note: From this point forward, there will not be much detail provided about how to discover where certain elements are contained within the HTML. Just note that this is done through a combination of finding web elements using browser developer tools and Beautiful Soup navigation techniques. Obviously, different pages are build differently by different developers, so this is the part of web scraping tasks that will vary from page to page and will require some amount of researching in order to get what you need.*
 
 ## Extract Data
 
-Ultimately, this project will end up with a single data set: a Pandas dataframe. This will be created by applying the **from_dict** method on a dictionary of lists (where each dictionary key is a dataframe variable with a list containing the values for every record). Each of the data gathering techniques, then, will involve gathering the data from the search return into separate lists.
+Ultimately, this project will end up with a single data set: a Pandas dataframe. This will be created by applying the **from_dict** method on a dictionary of lists (where each dictionary key is a dataframe variable pointing to a list containing the values for each record). For this reason, the data gathering will invlolve building separate lists to be assigned to dictionary keys.
 
-To begin, make sure that all of the **div class="s-item-container"** tags in the list have some information contained within them as they are not of interest otherwise. The Beautiful Soup **contents** method will return each of the children of a Beutiful Soup object. The length of the **contents** call will be 0 if no children are present. Use this information along with list comprehension to clean up the main product list.
+To begin, make sure that all of the **div class="s-item-container"** tags in the list have at least *some* information contained within them as they are not of interest otherwise. The Beautiful Soup **contents** method will return all the children of a Beautiful Soup object. The length of the **contents** call will be 0 if no children are present. Use this information along with list comprehension to clean up the main product list.
 
 ```python
 prod_li = [bso for bso in prod_li if len(bso.contents) > 0]
@@ -109,9 +109,9 @@ prod_li = [bso for bso in prod_li if len(bso.contents) > 0]
 
 Each product title is located inside an **h2** tag which is a child of each of the **div class="s-item-container"** tags pulled for the main product list. 
 
-Calling a tag name on an object will return the first instance of that tag (Ex: **soup.a** returns the first **a** tag located inside of a Beautiful Soup object called soup). Subsequently, the **get_text** method returns only the text contained inside of of a given tag. Since the **h2** tag contains the product title text, you can use a combined approach in a list comprehension to build a new list conatining the product titles.
+Calling a tag name on an object will return the first instance of that tag (Ex: **soup.a** returns the first **a** tag located inside of a Beautiful Soup object called **soup**). Subsequently, the **get_text** method returns only the text contained inside of of a given tag. Since the **h2** tag contains the product title text, you can use a combined approach in a list comprehension to build a new list conatining the product titles.
 
-Also note (as you can see from the HTML snippet above that shows product title above), the **h2** tag will return the text "[Sponsored]". Since this information isn't necessarily a part of the desired data, you can remove as you pull in the title text using a pattern substitute function from the **re** package.
+Also note as you can see from the sample product HTML snippet above, the **h2** tag will return the text "[Sponsored]". Since this information isn't necessarily a part of the desired data, you can remove it as you pull in the title text using a pattern substitute function from the **re** package.
 
 ```python
 import re
@@ -124,9 +124,9 @@ prod_title = [re.sub('\[Sponsored\]', '', bso.h2.get_text()) for bso in prod_li]
 
 ### Product Price
 
-The price extraction is less straight forward than the title, but it provides a good example of how more complicated web design can make getting information more difficult and some approaches you can take to get there.
+The price extraction is less straight forward than the title, but is a good example of how more complicated web design techniques can make getting information more difficult and is an opportunity to show some approaches you can take to get there.
 
-In the case of Amazon, the pricing information is contained within a **span** tag, but the classes vary. In addition, sometimes there are price ranges listed, and sometimes there is no price listed at all. And for even further complication, prices are rarely created as a simple string. Take, for example, the Beautiful Soup object, **ex_soup** which was extracted and stored from the working product (EpicStep Women's Canvas Shoes ...), which is a typical price setup.
+In the case of Amazon, the pricing information is contained within a **span** tag, but the class of those tags vary. In addition, sometimes the prices are shown as a range of values (ex: $24.99-$36.99), and sometimes there is no price listed at all. And to add even more complication, prices are rarely created as a single, easy to read string within a single tag. Take, for example, the Beautiful Soup object, **ex_soup** which was extracted and stored from the working product (EpicStep Women's Canvas Shoes ...), and is a relatively typical example of how this web design deals with product prices.
 
 ```python
 >>> print(ex_soup.prettify())
@@ -177,11 +177,11 @@ If you were to **get_text** from this soup element, you would end up with line b
 </span>
 ```
 
-In the first case above, the price is contained inside similar tags in the same fashion as the previous example, but for a price range instead of a single price (this means two price tags separated by a '-'). In the second, the **span** tag class is different and the price is a simple string that is not divided up into separate 'whole' and 'fractional' class tags. All of these factors will need to be accounted for as prices are being extracted. 
+In the first case above, the price is contained inside similar tags in the same fashion as the previous example, but for a *price range* instead of a single price. In the second example, the **span** tag **class** is different than the others and the price is a simple string that is not divided up into separate 'whole' and 'fractional' class tags. All of these factors will need to be accounted for as prices are being extracted. 
 
-A useful aspect of Beautiful Soup is that you can create a custom function that returns **True** or **False** based on custom criteria and pass that function to **find_all**. You can also use a regular expression object for **find_all** arguments (such as **class_**, **string**, **href**, etc.). The code below applies both of these techniques to find prices based on the following criteria:
+A useful aspect of Beautiful Soup is that you can create a custom function (which returns **True** or **False**) based on custom criteria and pass that function to **find_all** as an argument. You can also use a regular expression object for **find_all** arguments (such as **class_**, **string**, **href**, etc.). The code below applies both of these techniques to find prices based on the following criteria:
 
-1. Look for **span** tag that has one of the following:
+1. Element shuold be a **span** tag that contains one or more of the following:
    * A child tag named **sup**
    * A string containing the '$' character
    * At least one child **span** tag of the class 'a-letter-space'
@@ -210,7 +210,7 @@ The next step is to **get_text** from each of the items in **pr_tag** and clean 
 
 ```python
 # first, get_text from pr_list: use split and join methods to remove white space
-# store '' in list if no soup object available to maintain record length and order
+# store '' in list if no soup object available in order to maintain length and order
 prod_price = ["".join(bso.get_text().split()) if bso else '' for bso in pr_tag] 
 
 >>> prod_price[0]
@@ -222,7 +222,7 @@ prod_price = ["".join(bso.get_text().split()) if bso else '' for bso in pr_tag]
 >>> prod_price[2]
 '$9.99'
 
-# next, add in decimals where missing for single price items and top of range prices
+# next, add in decimals where missing for single price items and ceiling prices
 prod_price = [prstr[:-2] + '.' + prstr[-2:] if '.' not in prstr else prstr for prstr in prod_price]
 
 >>> prod_price[0]
@@ -234,13 +234,14 @@ prod_price = [prstr[:-2] + '.' + prstr[-2:] if '.' not in prstr else prstr for p
 >>> prod_price[2]
 '$9.99'
 
-# finally, for price ranges, add decimal to bottom of range price
+# finally, for price ranges, add decimal to floor prices
 # create function for process to improve readability
 def add_dot_rng(prstr):
     prstr = prstr[:(prstr.find('-') - 2)] + '.' + prstr[(prstr.find('-') - 2):]
     return prstr
 
 
+# only add decimal if price string contains less than 2 decimals already
 prod_price = [add_dot_rng(prstr) if '-' in prstr and prstr.count('.') < 2 else prstr for prstr in prod_price]
 
 >>> prod_price[0]
@@ -255,7 +256,7 @@ prod_price = [add_dot_rng(prstr) if '-' in prstr and prstr.count('.') < 2 else p
 
 ### Product Rating
 
-The rating for each product, if available, is contained within a **span** tag of class 'a-icon-alt'. However, this class of **span** is also used for other icons so in order to differentiate, look for the word 'star' in the text. *Note: Again, maintain blanks where rating not available to keep lists the same length and order.*
+The rating for each product, if available, is contained within a **span** tag of class 'a-icon-alt'. However, this class of **span** is also used for other icons so in order to differentiate, look for the word 'star' in the text. *Note: Again, maintain blanks where rating not available to keep lists the same length.*
 
 ```python
 prod_rate = [bso.find('span', string=re.compile('star'), class_='a-icon-alt') for bso in prod_li]
